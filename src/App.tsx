@@ -20,7 +20,7 @@ function App() {
       </h6>
       <div className="grid grid-cols-2 items-start gap-2.5">
         {clipboardItems.map((clipboardItem, index) => (
-          <div key={index} className="rounded-md p-2.5 bg-white text-sm">
+          <div key={index} className="rounded-md p-2.5 bg-white hover:bg-slate-50 text-sm cursor-pointer select-none">
             {clipboardItem}
           </div>
         ))}
