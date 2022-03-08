@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { Snippet } from "./common/types";
 import { getAppData, setAppData } from "./utils";
 
 function App() {
-  const [snippets, setSnippets] = useState<string[]>([]);
+  const [snippets, setSnippets] = useState<Snippet[]>([]);
 
   const initializeApp = async () => {
     const appData = await getAppData();
@@ -31,11 +32,11 @@ function App() {
       <div className="grid grid-cols-2 items-start gap-2.5">
         {snippets.map((snippet, index) => (
           <div
-            key={index}
-            onClick={() => copySnippet(snippet)}
+            key={snippet.id}
+            onClick={() => copySnippet(snippet.content_data)}
             className="rounded-md p-2.5 bg-white hover:bg-slate-50 text-sm cursor-pointer select-none"
           >
-            {snippet}
+            {snippet.content_data}
           </div>
         ))}
       </div>
