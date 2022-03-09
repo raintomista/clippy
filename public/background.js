@@ -25,7 +25,7 @@ const INITIAL_APP_DATA = [
   },
 ];
 
-const CLIPBOARD_MAX_DURATION_MINUTES = 1;
+const CLIPBOARD_MAX_DURATION_MINUTES = 15;
 const SCHEDULER_INTERVAL_MINUTES = 0.25;
 
 function createSnippet(contentType, contentData) {
