@@ -11,3 +11,8 @@ export function getAppData(): Promise<Snippet[]> {
 export function setAppData(appData: Snippet[]) {
   chrome.storage.local.set({ appData });
 }
+
+export async function getBlobFromUrl(url: string) {
+  const response = await fetch(url);
+  return response.blob();
+}

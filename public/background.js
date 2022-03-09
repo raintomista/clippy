@@ -25,6 +25,17 @@ const INITIAL_APP_DATA = [
   },
 ];
 
+function createSnippet(contentType, contentData) {
+  const timestamp = new Date();
+
+  return {
+    id: timestamp.getTime(),
+    content_type: contentType,
+    content_data: contentData,
+    created_at: timestamp.toISOString(),
+  };
+}
+
 chrome.runtime.onInstalled.addListener(async () => {
   chrome.storage.local.set({ appData: INITIAL_APP_DATA });
 
@@ -38,4 +49,20 @@ chrome.runtime.onInstalled.addListener(async () => {
       files: ["content-script.js"],
     });
   }
+});
+
+chrome.contextMenus.create({
+  id: "clippy-copy-image",
+  title: "Copy Image with clippy",
+  contexts: ["image"],
+});
+
+chrome.contextMenus.onClicked.addListener(async (info) => {
+  const snippet = createSnippet("image/png", info.srcUrl);
+
+  chrome.storage.local.get("appData", (result) => {
+    const appData = [snippet, ...result.appData];
+
+    chrome.storage.local.set({ appData });
+  });
 });
