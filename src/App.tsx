@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Snippet } from "./common/types";
+import { Image, PlainText } from "./components";
 import { getAppData, setAppData } from "./utils";
 
 function App() {
@@ -16,10 +17,6 @@ function App() {
     });
   };
 
-  const copySnippet = async (snippet: string) => {
-    await navigator.clipboard.writeText(snippet);
-  };
-
   useEffect(() => {
     initializeApp();
   }, []);
@@ -30,15 +27,13 @@ function App() {
         Recent
       </h6>
       <div className="grid grid-cols-2 items-start gap-2.5">
-        {snippets.map((snippet, index) => (
-          <div
-            key={snippet.id}
-            onClick={() => copySnippet(snippet.content_data)}
-            className="rounded-md p-2.5 bg-white hover:bg-slate-50 text-sm cursor-pointer select-none"
-          >
-            {snippet.content_data}
-          </div>
-        ))}
+        {snippets.map((snippet, index) =>
+          snippet.content_type === "text/plain" ? (
+            <PlainText contentText={snippet.content_data} />
+          ) : (
+            <Image contentUrl={snippet.content_data} />
+          )
+        )}
       </div>
     </div>
   );
