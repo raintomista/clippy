@@ -25,6 +25,9 @@ const INITIAL_APP_DATA = [
   },
 ];
 
+const CLIPBOARD_MAX_DURATION_MINUTES = 15;
+const SCHEDULER_INTERVAL_MINUTES = 0.25;
+
 function createSnippet(contentType, contentData) {
   const timestamp = new Date();
 
@@ -35,6 +38,14 @@ function createSnippet(contentType, contentData) {
     created_at: timestamp.toISOString(),
   };
 }
+
+function scrubExpiredData(date, duration) {
+  const createdAt = new Date(date);
+  const milliseconds = Date.now() - createdAt.getTime();
+  const elapsed = milliseconds / (60 * 1000);
+  return elapsed < duration;
+}
+
 class Background {
   constructor() {}
 
@@ -42,6 +53,20 @@ class Background {
     this.addOnInstalledListener();
     this.createContextMenu();
     this.addContextMenuListener();
+    this.initializeScheduler();
+    this.addSchedulerListener();
+  }
+
+  async getAppData() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get("appData", (result) => {
+        resolve(result.appData);
+      });
+    });
+  }
+
+  setAppData(appData) {
+    chrome.storage.local.set({ appData });
   }
 
   addContextMenuListener() {
@@ -55,6 +80,12 @@ class Background {
     chrome.runtime.onInstalled.addListener(async () => {
       this.setAppData(INITIAL_APP_DATA);
       await this.injectContentScript();
+    });
+  }
+
+  addSchedulerListener() {
+    chrome.alarms.onAlarm.addListener(async () => {
+      await this.performDataCleanup();
     });
   }
 
@@ -73,6 +104,12 @@ class Background {
     });
   }
 
+  initializeScheduler() {
+    chrome.alarms.create({
+      periodInMinutes: SCHEDULER_INTERVAL_MINUTES,
+    });
+  }
+
   async injectContentScript() {
     const tabs = await chrome.tabs.query({
       url: ["http://*/*", "https://*/*"],
@@ -86,8 +123,12 @@ class Background {
     }
   }
 
-  setAppData(appData) {
-    chrome.storage.local.set({ appData });
+  async performDataCleanup() {
+    const appData = await this.getAppData();
+    const filteredData = appData.filter((snippet) =>
+      scrubExpiredData(snippet.created_at, CLIPBOARD_MAX_DURATION_MINUTES)
+    );
+    this.setAppData(filteredData);
   }
 }
 

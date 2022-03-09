@@ -3,7 +3,14 @@
   "name": "clippy - Gboard clipboard for Chrome",
   "version": "0.0.1",
   "manifest_version": 3,
-  "permissions": ["contextMenus", "scripting", "storage", "tabs", "unlimitedStorage"],
+  "permissions": [
+    "alarms",
+    "contextMenus",
+    "scripting",
+    "storage",
+    "tabs",
+    "unlimitedStorage"
+  ],
   "host_permissions": ["http://*/*", "https://*/*"],
   "action": {
     "default_popup": "index.html",
