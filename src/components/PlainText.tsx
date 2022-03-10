@@ -11,7 +11,7 @@ export function PlainText(props: PlainTextProps) {
   return (
     <div
       onClick={handleClick}
-      className="rounded-md p-2.5 bg-white hover:bg-slate-50 text-sm cursor-pointer select-none"
+      className="rounded-md p-2.5 bg-white hover:bg-slate-50 text-sm cursor-pointer select-none break-all"
     >
       {contentText}
     </div>
