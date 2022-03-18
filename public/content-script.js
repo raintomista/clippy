@@ -29,15 +29,21 @@ class ContentScript {
   }
 
   addClipboardListener() {
+    document.addEventListener("cut", this.addSnippetToClipboard.bind(this));
     document.addEventListener("copy", this.addSnippetToClipboard.bind(this));
   }
 
   async addSnippetToClipboard() {
     const appData = await getAppData();
+    const selectedText = await this.getSelectedText();
+    const snippet = createSnippet("text/plain", selectedText);
+    setAppData([snippet, ...appData]);
+  }
+
+  async getSelectedText() {
     const selection = document.getSelection();
-    const snippet = createSnippet("text/plain", selection.toString());
-    appData.unshift(snippet);
-    setAppData(appData);
+    const clipboardText = await navigator.clipboard.readText();
+    return selection.toString() || clipboardText;
   }
 }
 
