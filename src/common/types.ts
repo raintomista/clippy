@@ -7,7 +7,11 @@ export interface IconButtonProps {
   iconComponent: JSX.Element;
 }
 export interface ImageProps {
+  id: string;
   contentUrl: string;
+  editable: boolean;
+  selectItem: (id: string) => void;
+  selected: boolean;
 }
 
 export interface PlainTextProps {

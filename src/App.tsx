@@ -82,7 +82,14 @@ function App() {
               selected={selected.includes(snippet.id)}
             />
           ) : (
-            <Image contentUrl={snippet.content_data} />
+            <Image
+              id={snippet.id}
+              key={snippet.id}
+              contentUrl={snippet.content_data}
+              editable={editable}
+              selectItem={selectItem}
+              selected={selected.includes(snippet.id)}
+            />
           )
         )}
       </div>
