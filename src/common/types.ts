@@ -1,3 +1,7 @@
+export interface IconButtonProps {
+  handleClick: () => void;
+  iconComponent: JSX.Element;
+}
 export interface ImageProps {
   contentUrl: string;
 }
