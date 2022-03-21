@@ -11,7 +11,11 @@ export interface ImageProps {
 }
 
 export interface PlainTextProps {
+  id: string;
   contentText: string;
+  editable: boolean;
+  selectItem: (id: string) => void;
+  selected: boolean;
 }
 
 export interface Snippet {

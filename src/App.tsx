@@ -20,8 +20,14 @@ function App() {
     });
   };
 
+  const selectItem = (id: string) => {
+    if (!selected.includes(id)) setSelected([...selected, id]);
+    else setSelected(selected.filter((selectedId) => selectedId !== id));
+  };
+
   const toggleEdit = () => {
     setEditable((editable) => !editable);
+    setSelected([]);
   };
 
   useEffect(() => {
@@ -44,7 +50,14 @@ function App() {
       <div className="grid grid-cols-2 items-start gap-2.5">
         {snippets.map((snippet, index) =>
           snippet.content_type === "text/plain" ? (
-            <PlainText contentText={snippet.content_data} />
+            <PlainText
+              id={snippet.id}
+              key={snippet.id}
+              contentText={snippet.content_data}
+              editable={editable}
+              selectItem={selectItem}
+              selected={selected.includes(snippet.id)}
+            />
           ) : (
             <Image contentUrl={snippet.content_data} />
           )
