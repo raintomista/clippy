@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { PencilIcon } from "@heroicons/react/solid";
 import { Snippet } from "./common/types";
 import { IconButton, Image, PlainText } from "./components";
@@ -25,6 +25,12 @@ function App() {
     else setSelected(selected.filter((selectedId) => selectedId !== id));
   };
 
+  const headerText = useMemo(() => {
+    if (!editable) return "Recent";
+    if (selected.length === 0) return "Select Items";
+    else return `${selected.length} selected`;
+  }, [editable, selected]);
+
   const toggleEdit = () => {
     setEditable((editable) => !editable);
     setSelected([]);
@@ -38,7 +44,7 @@ function App() {
     <div className="overflow-y-auto w-screen h-screen p-2.5 bg-gray-100 ">
       <div className="flex gap-2">
         <h6 className="flex-1 text-sm text-gray-500 font-bold uppercase mb-2.5">
-          {editable ? 'Select Items' : 'Recent'}
+          {headerText}
         </h6>
         <div className="flex gap-2">
           <IconButton
