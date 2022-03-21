@@ -1,3 +1,7 @@
+export interface CheckboxProps {
+  checked: boolean;
+}
+
 export interface IconButtonProps {
   handleClick: () => void;
   iconComponent: JSX.Element;
