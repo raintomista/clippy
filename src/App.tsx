@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { PencilIcon, XIcon } from "@heroicons/react/solid";
+import { PencilIcon, TrashIcon, XIcon } from "@heroicons/react/solid";
 import { Snippet } from "./common/types";
 import { IconButton, Image, PlainText } from "./components";
 import { getAppData, setAppData } from "./utils";
@@ -7,14 +7,7 @@ import { getAppData, setAppData } from "./utils";
 function App() {
   const [editable, setEditable] = useState<boolean>(false);
   const [selected, setSelected] = useState<string[]>([]);
-  const [snippets, setSnippets] = useState<Snippet[]>([
-    {
-      id: new Date().getTime().toString(),
-      created_at: new Date().toISOString(),
-      content_type: "text/plain",
-      content_data: "haha",
-    },
-  ]);
+  const [snippets, setSnippets] = useState<Snippet[]>([]);
 
   const initializeApp = async () => {
     const appData = await getAppData();
@@ -27,16 +20,22 @@ function App() {
     });
   };
 
-  const selectItem = (id: string) => {
-    if (!selected.includes(id)) setSelected([...selected, id]);
-    else setSelected(selected.filter((selectedId) => selectedId !== id));
-  };
 
   const headerText = useMemo(() => {
     if (!editable) return "Recent";
     if (selected.length === 0) return "Select Items";
     else return `${selected.length} selected`;
   }, [editable, selected]);
+
+  const removeItems = () => {
+    setAppData(snippets.filter((snippet) => !selected.includes(snippet.id)));
+    toggleEdit();
+  };
+
+  const selectItem = (id: string) => {
+    if (!selected.includes(id)) setSelected([...selected, id]);
+    else setSelected(selected.filter((selectedId) => selectedId !== id));
+  };
 
   const toggleEdit = () => {
     setEditable((editable) => !editable);
@@ -56,15 +55,24 @@ function App() {
             iconComponent={<XIcon className="text-gray-500 select-none" />}
           />
         )}
-        <h6 className="flex-1 text-sm text-gray-500 font-bold uppercase mb-2.5">
+        <h6 className="flex-1 mb-2.5 text-sm text-gray-500 font-bold uppercase">
           {headerText}
         </h6>
-        {!editable && (
+        {!editable ? (
           <div className="flex gap-2">
             <IconButton
               handleClick={toggleEdit}
               iconComponent={
                 <PencilIcon className="text-gray-500 select-none" />
+              }
+            />
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <IconButton
+              handleClick={removeItems}
+              iconComponent={
+                <TrashIcon className="text-gray-500 select-none" />
               }
             />
           </div>
