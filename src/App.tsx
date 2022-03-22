@@ -7,14 +7,7 @@ import { getAppData, setAppData } from "./utils";
 function App() {
   const [editable, setEditable] = useState<boolean>(false);
   const [selected, setSelected] = useState<string[]>([]);
-  const [snippets, setSnippets] = useState<Snippet[]>([
-    {
-      id: new Date().getTime().toString(),
-      created_at: new Date().toISOString(),
-      content_type: "text/plain",
-      content_data: "haha",
-    },
-  ]);
+  const [snippets, setSnippets] = useState<Snippet[]>([]);
 
   const initializeApp = async () => {
     const appData = await getAppData();
