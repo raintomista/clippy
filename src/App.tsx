@@ -27,16 +27,17 @@ function App() {
     });
   };
 
-  const selectItem = (id: string) => {
-    if (!selected.includes(id)) setSelected([...selected, id]);
-    else setSelected(selected.filter((selectedId) => selectedId !== id));
-  };
 
   const headerText = useMemo(() => {
     if (!editable) return "Recent";
     if (selected.length === 0) return "Select Items";
     else return `${selected.length} selected`;
   }, [editable, selected]);
+
+  const selectItem = (id: string) => {
+    if (!selected.includes(id)) setSelected([...selected, id]);
+    else setSelected(selected.filter((selectedId) => selectedId !== id));
+  };
 
   const toggleEdit = () => {
     setEditable((editable) => !editable);
