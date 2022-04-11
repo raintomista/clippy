@@ -1,27 +1,29 @@
 const INITIAL_APP_DATA = [
   {
-    id: '1646734298207',
-    content_type: 'text/plain',
-    content_data: 'Welcome to Gboard clipboard, any text that you copy will be saved...',
-    created_at: '2022-03-08T10:11:38.207Z'
+    id: "1646734298207",
+    content_type: "text/plain",
+    content_data:
+      "Welcome to Gboard clipboard, any text that you copy will be saved...",
+    created_at: "2022-03-08T10:11:38.207Z",
   },
   {
-    id: '1646734294410',
-    content_type: 'text/plain',
-    content_data: 'Tap on a clip to paste it in the textbox',
-    created_at: '2022-03-08T10:11:34.410Z'
+    id: "1646734294410",
+    content_type: "text/plain",
+    content_data: "Tap on a clip to paste it in the textbox",
+    created_at: "2022-03-08T10:11:34.410Z",
   },
   {
-    id: '1646734290073',
-    content_type: 'text/plain',
-    content_data: 'Use the edit icon to pin, add or delete clips',
-    created_at: '2022-03-08T10:11:30.073Z'
+    id: "1646734290073",
+    content_type: "text/plain",
+    content_data: "Use the edit icon to pin, add or delete clips",
+    created_at: "2022-03-08T10:11:30.073Z",
   },
   {
-    id: '1646734285577',
-    content_type: 'text/plain',
-    content_data: 'Touch and hold a clip to pin it. Unpinned clips will be deleted after 1 hours.',
-    created_at: '2022-03-08T10:11:25.577Z'
+    id: "1646734285577",
+    content_type: "text/plain",
+    content_data:
+      "Touch and hold a clip to pin it. Unpinned clips will be deleted after 1 hours.",
+    created_at: "2022-03-08T10:11:25.577Z",
   },
 ];
 
@@ -57,16 +59,16 @@ class Background {
     this.addSchedulerListener();
   }
 
-  async getAppData() {
+  async getLocalStorage(key) {
     return new Promise((resolve) => {
-      chrome.storage.local.get("appData", (result) => {
-        resolve(result.appData);
+      chrome.storage.local.get(key, (result) => {
+        resolve(result[key]);
       });
     });
   }
 
-  setAppData(appData) {
-    chrome.storage.local.set({ appData });
+  setLocalStorage(key, data) {
+    chrome.storage.local.set({ [key]: data });
   }
 
   addContextMenuListener() {
@@ -78,7 +80,8 @@ class Background {
 
   addOnInstalledListener() {
     chrome.runtime.onInstalled.addListener(async () => {
-      this.setAppData(INITIAL_APP_DATA);
+      this.setLocalStorage('recent', []);
+      this.setLocalStorage("pinned", INITIAL_APP_DATA);
       await this.injectContentScript();
     });
   }
@@ -89,11 +92,9 @@ class Background {
     });
   }
 
-  addSnippetToClipboard(snippet) {
-    chrome.storage.local.get("appData", (result) => {
-      const appData = [snippet, ...result.appData];
-      chrome.storage.local.set({ appData });
-    });
+  async addSnippetToClipboard(snippet) {
+    const appData = await this.getLocalStorage("recent");
+    this.setLocalStorage("recent", [snippet, ...appData]);
   }
 
   createContextMenu() {
@@ -124,11 +125,11 @@ class Background {
   }
 
   async performDataCleanup() {
-    const appData = await this.getAppData();
+    const appData = await this.getLocalStorage('recent');
     const filteredData = appData.filter((snippet) =>
       scrubExpiredData(snippet.created_at, CLIPBOARD_MAX_DURATION_MINUTES)
     );
-    this.setAppData(filteredData);
+    this.setLocalStorage("recent", filteredData);
   }
 }
 

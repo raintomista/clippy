@@ -9,16 +9,16 @@ function createSnippet(contentType, contentData) {
   };
 }
 
-function getAppData() {
+function getLocalStorage(key) {
   return new Promise((resolve) => {
-    chrome.storage.local.get("appData", (result) => {
-      resolve(result.appData);
+    chrome.storage.local.get(key, (result) => {
+      resolve(result[key]);
     });
   });
 }
 
-function setAppData(appData) {
-  chrome.storage.local.set({ appData });
+function setAppData(key, data) {
+  chrome.storage.local.set({ [key]: data });
 }
 
 class ContentScript {
@@ -34,10 +34,10 @@ class ContentScript {
   }
 
   async addSnippetToClipboard() {
-    const appData = await getAppData();
+    const appData = await getLocalStorage('recent');
     const selectedText = await this.getSelectedText();
     const snippet = createSnippet("text/plain", selectedText);
-    setAppData([snippet, ...appData]);
+    setAppData('recent', [snippet, ...appData]);
   }
 
   async getSelectedText() {

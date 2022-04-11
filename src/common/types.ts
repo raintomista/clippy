@@ -29,6 +29,11 @@ export interface Snippet {
   content_data: string;
 }
 
-export interface Storage {
-  appData?: Snippet[];
+export enum StorageKey {
+  PINNED = "pinned",
+  RECENT = "recent",
 }
+
+export type Storage = {
+  [key: string]: Snippet[];
+};
