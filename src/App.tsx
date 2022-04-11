@@ -1,25 +1,37 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { PencilIcon, TrashIcon, XIcon } from "@heroicons/react/solid";
-import { Snippet } from "./common/types";
+import { Snippet, StorageKey } from "./common/types";
 import { IconButton, Image, PlainText } from "./components";
-import { getAppData, setAppData } from "./utils";
+import { getLocalStorage, setLocalStorage } from "./utils";
 
 function App() {
   const [editable, setEditable] = useState<boolean>(false);
   const [selected, setSelected] = useState<string[]>([]);
-  const [snippets, setSnippets] = useState<Snippet[]>([]);
+  const [recent, setRecent] = useState<Snippet[]>([]);
+  const [pinned, setPinned] = useState<Snippet[]>([]);
 
   const initializeApp = async () => {
-    const appData = await getAppData();
-    setSnippets(appData);
+    const recent = await getLocalStorage(StorageKey.RECENT);
+    setRecent(recent);
+
+    const pinned = await getLocalStorage(StorageKey.PINNED);
+    setPinned(pinned);
 
     chrome.storage.onChanged.addListener((changes) => {
-      for (let change of Object.values(changes)) {
-        setSnippets(change.newValue);
+      for (let [key, change] of Object.entries(changes)) {
+        switch (key) {
+          case StorageKey.RECENT:
+            setRecent(change.newValue);
+            break;
+          case StorageKey.PINNED:
+            setPinned(change.newValue);
+            break;
+          default:
+            break;
+        }
       }
     });
   };
-
 
   const headerText = useMemo(() => {
     if (!editable) return "Recent";
@@ -28,7 +40,11 @@ function App() {
   }, [editable, selected]);
 
   const removeItems = () => {
-    setAppData(snippets.filter((snippet) => !selected.includes(snippet.id)));
+    setLocalStorage(
+      StorageKey.RECENT,
+      recent.filter((snippet) => !selected.includes(snippet.id))
+    );
+
     toggleEdit();
   };
 
@@ -79,7 +95,33 @@ function App() {
         )}
       </div>
       <div className="grid grid-cols-2 items-start gap-2.5">
-        {snippets.map((snippet, index) =>
+        {recent.map((snippet, index) =>
+          snippet.content_type === "text/plain" ? (
+            <PlainText
+              id={snippet.id}
+              key={snippet.id}
+              contentText={snippet.content_data}
+              editable={editable}
+              selectItem={selectItem}
+              selected={selected.includes(snippet.id)}
+            />
+          ) : (
+            <Image
+              id={snippet.id}
+              key={snippet.id}
+              contentUrl={snippet.content_data}
+              editable={editable}
+              selectItem={selectItem}
+              selected={selected.includes(snippet.id)}
+            />
+          )
+        )}
+      </div>
+      <h6 className="flex-1 my-2.5 text-sm text-gray-500 font-bold uppercase">
+        Pinned
+      </h6>
+      <div className="grid grid-cols-2 items-start gap-2.5">
+        {pinned.map((snippet, index) =>
           snippet.content_type === "text/plain" ? (
             <PlainText
               id={snippet.id}
